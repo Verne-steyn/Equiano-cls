@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EASSy CLS — Test Equipment</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface2: #f8f9fa;
+    --border: #d0dae4;
+    --border-strong: #b0bfcc;
+    --text: #1a2a3a;
+    --text-mid: #3a5068;
+    --muted: #6b7f94;
+    --green: #059669;
+    --green-light: #10b981;
+    --green-bg: #f0fdf4;
+    --green-border: #a7f3d0;
+    --amber: #d97706;
+    --amber-light: #f59e0b;
+    --amber-bg: #fffbeb;
+    --amber-border: #fde68a;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --red-border: #fecaca;
+    --teal: #0077a8;
+    --teal-bg: #f0f9ff;
+    --teal-border: #bae6fd;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .page-header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    padding: 0 32px;
+    display: flex; align-items: center; gap: 16px;
+    height: 58px;
+  }
+
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--muted); text-decoration: none;
+    font-size: 13px; font-weight: 500; transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--green); }
+
+  .header-sep { width: 1px; height: 24px; background: var(--border); }
+
+  .header-icon {
+    width: 32px; height: 32px; background: var(--green-bg);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 18px;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--green);
+  }
+
+  .header-spacer { flex: 1; }
+
+  .user-pill {
+    background: var(--green-bg); border: 1px solid var(--green-border);
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 12px; color: var(--green); font-weight: 600;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px; border: none;
+    font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #047857; }
+  .btn-outline { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--green); color: var(--green); }
+  .btn-ghost { background: transparent; color: var(--muted); border: none; }
+  .btn-ghost:hover { color: var(--text); }
+  .btn-red { background: var(--red); color: white; }
+  .btn-red:hover { background: #b91c1c; }
+  .btn-amber { background: var(--amber); color: white; }
+  .btn-amber:hover { background: #b45309; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* Auth overlay */
+  .auth-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(240,244,248,0.97);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .auth-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 40px; width: 380px; max-width: 92vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  }
+
+  .auth-logo { text-align: center; margin-bottom: 28px; }
+  .auth-logo .badge {
+    display: inline-block; width: 56px; height: 56px;
+    background: linear-gradient(135deg, #047857, var(--green-light));
+    border-radius: 14px; line-height: 56px; font-size: 26px; margin-bottom: 12px;
+  }
+  .auth-logo h2 {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--green);
+  }
+  .auth-logo p { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .form-group input, .form-group select {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; color: var(--text);
+    font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--green); }
+
+  .auth-msg { font-size: 12px; text-align: center; margin-top: 12px; min-height: 18px; color: var(--red); }
+  .auth-msg.success { color: var(--green); }
+
+  /* Content */
+  .content { position: relative; z-index: 10; max-width: 1400px; margin: 0 auto; padding: 32px; }
+
+  .station-bar {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; flex-wrap: wrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .station-label {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+  }
+
+  .station-chip {
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text-mid); font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;
+  }
+  .station-chip:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .station-chip.active { background: var(--green); border-color: var(--green); color: white; }
+
+  /* Stats */
+  .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 700px) { .stats-strip { grid-template-columns: repeat(2,1fr); } .content { padding: 16px; } }
+
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px; position: relative; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius: 12px 12px 0 0; }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.amber::before { background: var(--amber); }
+  .stat-card.red::before { background: var(--red); }
+  .stat-card.blue::before { background: var(--teal); }
+
+  .stat-label { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .stat-value { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; }
+  .stat-card.green .stat-value { color: var(--green); }
+  .stat-card.amber .stat-value { color: var(--amber); }
+  .stat-card.red .stat-value { color: var(--red); }
+  .stat-card.blue .stat-value { color: var(--teal); }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .toolbar-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text); flex: 1; }
+
+  /* Equipment cards */
+  .equip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+
+  .equip-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; transition: all 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .equip-card:hover { border-color: var(--green-light); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+  .equip-card-top {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--surface2);
+  }
+
+  .equip-icon-circle {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--green-bg); border: 1px solid var(--green-border);
+    display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+
+  .equip-meta { flex: 1; min-width: 0; }
+  .equip-no { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .equip-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .equip-model { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .equip-status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .dot-green { background: var(--green); box-shadow: 0 0 6px rgba(5,150,105,0.4); }
+  .dot-amber { background: var(--amber-light); box-shadow: 0 0 6px rgba(245,158,11,0.3); }
+  .dot-red { background: var(--red); box-shadow: 0 0 6px rgba(220,38,38,0.3); }
+  .dot-grey { background: var(--muted); }
+
+  .equip-card-body { padding: 14px 20px; }
+
+  .equip-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 12px; }
+  .equip-row-label { color: var(--muted); font-weight: 500; }
+  .equip-row-val { color: var(--text); font-weight: 600; text-align: right; }
+
+  .calib-bar-bg { height: 4px; background: var(--border); border-radius: 4px; margin: 8px 0 14px; overflow: hidden; }
+  .calib-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .calib-ok { background: var(--green); }
+  .calib-warn { background: var(--amber-light); }
+  .calib-overdue { background: var(--red); }
+
+  .calib-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
+  .tag-ok { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .tag-warn { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .tag-overdue { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .tag-unknown { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  .equip-card-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; background: var(--surface2); }
+
+  /* Check mode overlay */
+  .check-overlay {
+    background: var(--green-bg); border: 1px solid var(--green-border);
+    border-radius: 12px; padding: 14px; margin-top: 10px; display: none;
+  }
+  .check-mode-active .check-overlay { display: block; }
+
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .check-field-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+
+  .check-select {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px; color: var(--text); font-size: 12px; outline: none; cursor: pointer;
+  }
+  .check-select:focus { border-color: var(--green); }
+  .check-select.pass { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .check-select.fail { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+  .check-select.na { border-color: var(--muted); color: var(--muted); }
+
+  .check-input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px; color: var(--text); font-size: 12px; outline: none;
+  }
+  .check-input:focus { border-color: var(--green); }
+
+  /* Check banner */
+  .check-banner {
+    background: var(--green-bg); border: 1px solid var(--green-border);
+    border-radius: 12px; padding: 14px 20px; margin-bottom: 20px; display: none;
+    align-items: center; gap: 12px;
+  }
+  .check-banner.active { display: flex; }
+
+  /* Modals */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(240,244,248,0.92);
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px;
+    width: 500px; max-width: 94vw; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  }
+
+  .modal h3 {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--green); margin-bottom: 20px;
+  }
+
+  .form-row { margin-bottom: 16px; }
+  .form-row label {
+    display: block; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--text);
+    font-family: 'Barlow', sans-serif; font-size: 13px; outline: none;
+    transition: border-color 0.2s; resize: vertical;
+  }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--green); }
+
+  .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .full { grid-column: 1/-1; }
+
+  .checkbox-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+  }
+  .checkbox-row input[type="checkbox"] { accent-color: var(--green); width: 16px; height: 16px; }
+  .checkbox-row label { font-size: 13px; color: var(--text); cursor: pointer; margin: 0; letter-spacing: 0; text-transform: none; font-weight: 400; }
+
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+  /* Checks history */
+  .checks-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-top: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .panel-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .panel-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green); flex: 1; }
+  .panel-badge { background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 20px; padding: 2px 10px; font-size: 11px; font-weight: 600; color: var(--green); }
+
+  .check-row-hist { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .check-row-hist:last-child { border-bottom: none; }
+
+  /* Alerts */
+  .alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .alert-warn { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber); }
+  .alert-info { background: var(--teal-bg); border: 1px solid var(--teal-border); color: var(--teal); }
+  .alert-err { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red); }
+  .alert-ok { background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green); }
+
+  .loading { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+  .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .sticky-submit-bar {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 150;
+    background: var(--surface);
+    border-top: 2px solid var(--green);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
+    padding: 14px 32px;
+    align-items: center;
+    gap: 16px;
+  }
+  .sticky-submit-bar.active { display: flex; }
+  .sticky-bar-text { flex: 1; }
+  .sticky-bar-text strong { font-size: 14px; font-weight: 600; color: var(--text); display: block; }
+  .sticky-bar-text span { font-size: 12px; color: var(--muted); }
+  body.check-active { padding-bottom: 72px; }
+
+  .hidden { display: none !important; }
+</style>
+</style>
+</head>
+<body>
+
+<!-- Auth redirect overlay -->
+<div class="auth-overlay" id="authOverlay" style="display:none;">
+  <div class="auth-card" style="text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">📡</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:8px;">Test Equipment</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">You need to be signed in to access this page.</p>
+    <a href="home.html" class="btn btn-green" style="width:100%;justify-content:center;">← Go to Portal to Sign In</a>
+  </div>
+</div>
+
+<!-- Add Equipment Modal -->
+<div class="modal-overlay" id="addEquipModal">
+  <div class="modal">
+    <h3>➕ Add Test Equipment</h3>
+    <div class="form-grid-2">
+      <div class="form-row full">
+        <label>Equipment Name *</label>
+        <input type="text" id="newEquipName" placeholder="e.g. Optical Power Meter">
+      </div>
+      <div class="form-row full">
+        <label>Description / Model</label>
+        <input type="text" id="newEquipDesc" placeholder="e.g. FPM-3000">
+      </div>
+      <div class="form-row">
+        <label>Supplier / Manufacturer</label>
+        <input type="text" id="newEquipSupplier" placeholder="e.g. Exfo">
+      </div>
+      <div class="form-row">
+        <label>Serial Number</label>
+        <input type="text" id="newEquipSerial" placeholder="e.g. SN20180045">
+      </div>
+      <div class="form-row full">
+        <label>Backup Unit Available?</label>
+        <select id="newEquipBackup">
+          <option value="no">No — single unit only</option>
+          <option value="yes">Yes — backup unit available</option>
+          <option value="shared">Shared with another station</option>
+        </select>
+      </div>
+      <div class="form-row full">
+        <label>Has Mains Power Supply?</label>
+        <div class="checkbox-row">
+          <input type="checkbox" id="newEquipPowered" checked>
+          <label for="newEquipPowered">⚡ This equipment has a mains power cord / PSU that must be checked</label>
+        </div>
+      </div>
+      <div class="form-row full">
+        <label>Has Internal Battery?</label>
+        <div class="checkbox-row">
+          <input type="checkbox" id="newEquipBattery">
+          <label for="newEquipBattery">🔋 This equipment has an internal battery that must be checked</label>
+        </div>
+      </div>
+      <div class="form-row full">
+        <label>Notes / Location</label>
+        <textarea id="newEquipNotes" rows="2" placeholder="Optional notes, accessories, storage location..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeAddEquip()">Cancel</button>
+      <button class="btn btn-green" onclick="saveNewEquip()">Add Equipment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Serial Number Modal -->
+<div class="modal-overlay" id="serialModal">
+  <div class="modal" style="max-width:400px;">
+    <h3>✏️ Edit Equipment Details</h3>
+    <input type="hidden" id="serialEquipId">
+    <div class="form-row">
+      <label>Serial Number</label>
+      <input type="text" id="serialInput" placeholder="e.g. SN20180045">
+    </div>
+    <div class="form-row">
+      <label>Backup Unit Available?</label>
+      <select id="serialBackup">
+        <option value="no">No — single unit only</option>
+        <option value="yes">Yes — backup unit available</option>
+        <option value="shared">Shared with another station</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Notes / Location</label>
+      <textarea id="serialNotes" rows="2" placeholder="Storage location, accessories..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeSerialModal()">Cancel</button>
+      <button class="btn btn-green" onclick="saveSerial()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Submit Check Modal -->
+<div class="modal-overlay" id="submitCheckModal">
+  <div class="modal" style="max-width:420px;">
+    <h3>✅ Submit 6-Monthly Check</h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.6;">
+      Submitting 6-monthly test equipment check for <strong id="submitStationName" style="color:var(--green);">—</strong>.
+    </p>
+    <div id="submitSummary" style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:20px;font-size:13px;"></div>
+    <div class="form-row">
+      <label>Supervisor Remarks</label>
+      <textarea id="submitRemarks" rows="2" placeholder="Any overall observations..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeSubmitModal()">Cancel</button>
+      <button class="btn btn-green" onclick="finalSubmit()">Confirm & Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="page-header">
+  <a href="home.html" class="back-btn">← Portal</a>
+  <div class="header-sep"></div>
+  <img src="data:image/png;base64,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" alt="Equiano" style="height:32px;object-fit:contain;">
+  <div class="header-sep"></div>
+  <div class="header-icon">📡</div>
+  <div class="header-title">Test Equipment</div>
+  <div class="header-spacer"></div>
+  <div id="loginArea" style="display:flex;align-items:center;gap:10px;">
+    <span class="user-pill" id="userPill">—</span>
+    <button class="btn btn-outline btn-sm" onclick="doLogout()">Sign Out</button>
+  </div>
+</header>
+
+<!-- Main content -->
+<div class="content" id="mainContent" style="display:none;">
+
+  <div class="station-bar">
+    <span class="station-label">Station:</span>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;flex:1;">
+      <button class="station-chip" onclick="selectStation('MNZ')">🇿🇦 MNZ</button>
+      <button class="station-chip" onclick="selectStation('MPT')">🇲🇿 MPT</button>
+      <button class="station-chip" onclick="selectStation('DES')">🇹🇿 DES</button>
+      <button class="station-chip" onclick="selectStation('MBS')">🇰🇪 MBS</button>
+      <button class="station-chip" onclick="selectStation('MGD')">🇸🇴 MGD</button>
+      <button class="station-chip" onclick="selectStation('DBT')">🇩🇯 DBT</button>
+      <button class="station-chip" onclick="selectStation('PSD')">🇸🇩 PSD</button>
+      <button class="station-chip" onclick="selectStation('TLR')">🇲🇬 TLR</button>
+      <button class="station-chip" onclick="selectStation('MRN')">🇰🇲 MRN</button>
+    </div>
+  </div>
+
+  <div id="stationContent">
+    <div class="alert alert-info">ℹ️ Select a station to view its test equipment inventory.</div>
+  </div>
+
+</div>
+
+<!-- Sticky submit bar -->
+<div class="sticky-submit-bar" id="stickySubmitBar">
+  <div class="sticky-bar-text">
+    <strong>6-Monthly Check in Progress</strong>
+    <span>Complete all items below then submit your check record.</span>
+  </div>
+  <button class="btn btn-outline" onclick="cancelCheck()" style="border-color:var(--red);color:var(--red);">✕ Cancel</button>
+  <button class="btn btn-green" onclick="openSubmitModal()" style="padding:10px 28px;font-size:14px;">✅ Save &amp; Submit Check</button>
+</div>
+
+<script>
+const SUPABASE_URL = 'EQUIANO_SUPABASE_URL_PLACEHOLDER';
+const SUPABASE_KEY = 'EQUIANO_SUPABASE_ANON_KEY_PLACEHOLDER';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const ADMIN_WHITELIST = {
+  'MRN':'assad.comorescables@outlook.com','TLR':'johary.ramboa@telma.mg',
+  'DBT':'farah.abdi@djibtel.dj','PSD':'abdelhameeda@sudatel.sd',
+  'MGD':'girde@dalkomsomalia.com','MBS':'totieno@telkom.co.ke',
+  'MNZ':'waynee@openserve.co.za','MPT':'nhiuane@tmcel.mz',
+  'DES':'omar.said@yas.co.tz','SUPER':'verne.steyn@wiocc.net'
+};
+
+const MASTER_EQUIP = [
+  {no:1,  equipment:"Digital Transmission Analyzer",      description:"STM64 DTA – 10GbE (EXFO FTB-200 + FTB-8130NGE module)", supplier:"Exfo",     is_powered:true,  has_battery:false},
+  {no:2,  equipment:"Optical Spectrum Analyzer",          description:"EXFO FTB-200 platform + FTB-5240S module",               supplier:"Exfo",     is_powered:true,  has_battery:false},
+  {no:3,  equipment:"Optical Time Domain Reflectometer",  description:"AXS-110-23B",                                            supplier:"Exfo",     is_powered:true,  has_battery:true},
+  {no:4,  equipment:"Optical Power Meter",                description:"FPM-3000",                                               supplier:"Exfo",     is_powered:true,  has_battery:true},
+  {no:5,  equipment:"Fiber Cleaning Set",                 description:"Lint-free wipes, IPA solution, swabs, reel cleaner",    supplier:"",         is_powered:false, has_battery:false},
+  {no:6,  equipment:"Visible Light Source",               description:"FLS-240",                                                supplier:"Exfo",     is_powered:true,  has_battery:true},
+  {no:7,  equipment:"Portable Fiberscope",                description:"FIP-400-D-Single (SC, LC, MU, FC tip adapters)",        supplier:"Exfo",     is_powered:false, has_battery:true},
+  {no:8,  equipment:"Fiber Splicing Kit",                 description:"Sumitomo T-39 Splicer + FC-6S Cleaver",                 supplier:"Sumitomo", is_powered:true,  has_battery:true},
+  {no:9,  equipment:"Set of Fiber Patch Cords",           description:"SC/PC, SC/APC, FC/PC, MU, LC variants — 3m",           supplier:"Exfo",     is_powered:false, has_battery:false},
+  {no:10, equipment:"Set of Optical Attenuators",         description:"LC and MU attenuators: 2dB, 5dB, 10dB",               supplier:"",         is_powered:false, has_battery:false},
+  {no:11, equipment:"Variable Optical Attenuator",        description:"FVA-60-B-B",                                            supplier:"Exfo",     is_powered:true,  has_battery:false},
+  {no:12, equipment:"Electric Clamp Meter",               description:"CA 5287 with B102 clamp and thermocouple adaptor",     supplier:"Exfo",     is_powered:false, has_battery:true},
+  {no:13, equipment:"Portable Electrical Source",         description:"GPR11H30D with mini clamp option",                     supplier:"Exfo",     is_powered:true,  has_battery:true}
+];
+
+const EQUIP_ICONS = {
+  "Digital Transmission Analyzer":"📊","Optical Spectrum Analyzer":"🌈",
+  "Optical Time Domain Reflectometer":"📡","Optical Power Meter":"💡",
+  "Fiber Cleaning Set":"🧹","Visible Light Source":"🔦",
+  "Portable Fiberscope":"🔬","Fiber Splicing Kit":"⚡",
+  "Set of Fiber Patch Cords":"🔌","Set of Optical Attenuators":"🎚️",
+  "Variable Optical Attenuator":"🎛️","Electric Clamp Meter":"🔋",
+  "Portable Electrical Source":"🔌"
+};
+
+const STATION_NAMES = {MNZ:'Mtunzini',MPT:'Maputo',DES:'Dar es Salaam',MBS:'Mombasa',MGD:'Mogadishu',DBT:'Djibouti',PSD:'Port Sudan',TLR:'Toliary',MRN:'Moroni'};
+const FLAGS = {MNZ:'🇿🇦',MPT:'🇲🇿',DES:'🇹🇿',MBS:'🇰🇪',MGD:'🇸🇴',DBT:'🇩🇯',PSD:'🇸🇩',TLR:'🇲🇬',MRN:'🇰🇲'};
+
+let currentUser = null, userProfile = null, currentStation = null;
+let inventory = [], checkMode = false, checkData = {};
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await handleSession(session);
+  sb.auth.onAuthStateChange(async (ev, session) => {
+    if (session) await handleSession(session);
+    else showAuth();
+  });
+}
+
+async function handleSession(session) {
+  currentUser = session.user;
+  const { data: p } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  userProfile = p;
+  document.getElementById('authOverlay').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('loginArea').style.display = 'flex';
+  document.getElementById('userPill').textContent = (p?.full_name || currentUser.email.split('@')[0]) + ' · ' + (p?.station_code || '—');
+  if (p?.station_code) selectStation(p.station_code);
+}
+
+function showAuth() { window.location.href = 'home.html'; }
+
+function isAdmin() {
+  if (!currentUser) return false;
+  return currentUser.email === ADMIN_WHITELIST.SUPER || currentUser.email === ADMIN_WHITELIST[userProfile?.station_code];
+}
+
+function canEdit() {
+  if (!currentUser) return false;
+  if (currentUser.email === ADMIN_WHITELIST.SUPER) return true;
+  return userProfile?.station_code === currentStation;
+}
+
+async function doLogout() { await sb.auth.signOut(); window.location.href = 'home.html'; }
+
+async function selectStation(code) {
+  currentStation = code;
+  checkMode = false; checkData = {};
+  document.querySelectorAll('.station-chip').forEach(c => {
+    c.classList.toggle('active', c.textContent.includes(code));
+  });
+  await renderStation();
+}
+
+async function renderStation() {
+  const el = document.getElementById('stationContent');
+  el.innerHTML = `<div class="loading"><div class="spinner"></div><br>Loading ${currentStation} equipment...</div>`;
+
+  const { data: inv, error } = await sb.from('testequip_inventory')
+    .select('*').eq('station_code', currentStation).order('equip_no');
+
+  if (error) {
+    el.innerHTML = `<div class="alert alert-err">❌ Error: ${error.message} (code: ${error.code})</div>`;
+    return;
+  }
+
+  inventory = inv || [];
+
+  // Auto-seed master list if inventory is empty
+  if (inventory.length === 0 && canEdit()) {
+    el.innerHTML = `<div class="loading"><div class="spinner"></div><br>Setting up ${currentStation} equipment...</div>`;
+    await autoSeedMaster();
+    const { data: inv2 } = await sb.from('testequip_inventory')
+      .select('*').eq('station_code', currentStation).order('equip_no');
+    inventory = inv2 || [];
+  }
+
+  const { data: lastChecks } = await sb.from('testequip_checks')
+    .select('*').eq('station_code', currentStation)
+    .order('check_date', { ascending: false }).limit(5);
+
+  el.innerHTML = buildStationHTML(lastChecks || []);
+}
+
+function buildStationHTML(lastChecks) {
+  const flag = FLAGS[currentStation];
+  const name = STATION_NAMES[currentStation];
+  const editable = canEdit();
+
+  const total = inventory.length;
+  const withSerial = inventory.filter(e => e.serial_no && e.serial_no.trim()).length;
+  const withBackup = inventory.filter(e => e.redundancy === 'yes').length;
+  const powered = inventory.filter(e => e.is_powered || e.has_battery).length;
+
+  let lastCheckDate = '—';
+  if (lastChecks.length > 0) {
+    lastCheckDate = new Date(lastChecks[0].check_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  }
+
+  let dueAlert = '';
+  if (lastChecks.length > 0) {
+    const due = new Date(lastChecks[0].check_date);
+    due.setMonth(due.getMonth() + 6);
+    const days = Math.round((due - new Date()) / 86400000);
+    if (days < 0) dueAlert = `<div class="alert alert-err">⚠️ 6-Monthly check OVERDUE by ${Math.abs(days)} days</div>`;
+    else if (days <= 30) dueAlert = `<div class="alert alert-warn">🔔 6-Monthly check due in ${days} days</div>`;
+  } else {
+    dueAlert = `<div class="alert alert-warn">📋 No 6-monthly check recorded for this station yet.</div>`;
+  }
+
+  const missingSerial = total - withSerial;
+  if (missingSerial > 0) {
+    dueAlert += `<div class="alert alert-info">📝 ${missingSerial} item${missingSerial>1?'s':''} missing a serial number — click ✏️ on the card to add it.</div>`;
+  }
+
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+      <span style="font-size:32px;">${flag}</span>
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;letter-spacing:1px;color:var(--green);">${currentStation} — ${name}</div>
+        <div style="font-size:12px;color:var(--muted);">Test Equipment Inventory · Last check: ${lastCheckDate}</div>
+      </div>
+    </div>
+
+    ${dueAlert}
+
+    <div class="stats-strip">
+      <div class="stat-card green">
+        <div class="stat-label">Total Equipment</div>
+        <div class="stat-value">${total}</div>
+        <div class="stat-sub">items registered</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Serial Numbers</div>
+        <div class="stat-value">${withSerial}</div>
+        <div class="stat-sub">of ${total} recorded</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Backup Unit</div>
+        <div class="stat-value">${withBackup}</div>
+        <div class="stat-sub">items have backup</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Power / Battery</div>
+        <div class="stat-value">${powered}</div>
+        <div class="stat-sub">require power check</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-title">Equipment Inventory</div>
+      ${editable ? `
+  <button class="btn btn-green btn-sm" onclick="openAddEquip()">➕ Add Equipment</button>
+      ` : ''}
+      ${editable && !checkMode ? `<button class="btn btn-green btn-sm" onclick="startCheck()">▶ Start 6-Monthly Check</button>` : ''}
+      ${checkMode ? `
+        <button class="btn btn-red btn-sm" onclick="cancelCheck()">✕ Cancel</button>
+        <button class="btn btn-green" onclick="openSubmitModal()">✅ Submit Check</button>
+      ` : ''}
+    </div>
+
+    ${checkMode ? `
+      <div class="check-banner active">
+        <span style="font-size:20px;">📋</span>
+        <div style="flex:1;">
+          <strong style="color:var(--green);font-size:14px;display:block;">6-Monthly Check in Progress</strong>
+          <span style="font-size:12px;color:var(--text-mid);">For each item confirm: present, functional test, cord/PSU condition, battery condition, accessories complete, backup unit status.</span>
+        </div>
+      </div>
+    ` : ''}
+
+    <div class="equip-grid ${checkMode ? 'check-mode-active' : ''}" id="equipGrid">
+      ${inventory.length === 0 ? `
+        <div class="alert alert-info" style="grid-column:1/-1;">
+          📦 No equipment registered yet.
+        </div>
+      ` : inventory.map(e => renderEquipCard(e, editable)).join('')}
+    </div>
+
+    ${lastChecks.length > 0 ? `
+      <div class="checks-panel">
+        <div class="panel-header">
+          <h3>📅 Previous 6-Monthly Checks</h3>
+          <span class="panel-badge">${lastChecks.length} records</span>
+        </div>
+        ${lastChecks.map(c => {
+          const score = c.items_ok && c.items_total ? Math.round(c.items_ok/c.items_total*100) : null;
+          return `<div class="check-row-hist">
+            <span style="color:var(--muted);font-size:12px;min-width:100px;">${new Date(c.check_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</span>
+            <span style="flex:1;">${c.checked_by||'—'}</span>
+            ${score!==null?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:${score>=90?'var(--green)':score>=70?'var(--amber)':'var(--red)'};">${score}%</span>`:''}
+            <span style="font-size:11px;color:var(--muted);">${c.items_ok||0}/${c.items_total||0} OK</span>
+            ${c.remarks ? `<span style="font-size:11px;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.remarks}</span>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    ` : ''}
+  `;
+}
+
+function renderEquipCard(e, editable) {
+  const icon = EQUIP_ICONS[e.equipment] || '🔬';
+  const cd = checkData[e.id] || {};
+
+  // Backup unit display
+  const backupVal = e.redundancy || 'no';
+  const backupDisplay = backupVal === 'yes'
+    ? `<span style="color:var(--green);font-weight:600;">✅ Yes</span>`
+    : backupVal === 'shared'
+    ? `<span style="color:var(--amber);font-weight:600;">⚠️ Shared</span>`
+    : `<span style="color:var(--red);font-weight:600;">❌ No</span>`;
+
+  return `<div class="equip-card" id="card-${e.id}">
+    <div class="equip-card-top">
+      <div class="equip-icon-circle">${icon}</div>
+      <div class="equip-meta">
+        <div class="equip-no">Item ${e.equip_no}${e.supplier ? ' · ' + e.supplier : ''}</div>
+        <div class="equip-name">${e.equipment}</div>
+        <div class="equip-model">${e.description || ''}</div>
+      </div>
+    </div>
+
+    <div class="equip-card-body">
+      <div class="equip-row">
+        <span class="equip-row-label">Serial No.</span>
+        <span class="equip-row-val" style="${!e.serial_no ? 'color:var(--amber);font-style:italic;' : ''}">${e.serial_no || 'Not recorded'}</span>
+      </div>
+      <div class="equip-row">
+        <span class="equip-row-label">Backup Unit</span>
+        <span class="equip-row-val">${backupDisplay}</span>
+      </div>
+      <div style="display:flex;gap:8px;font-size:11px;color:var(--muted);flex-wrap:wrap;margin-top:8px;margin-bottom:4px;">
+        ${e.is_powered ? '<span style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:4px;padding:2px 7px;color:var(--amber);">⚡ Mains power</span>' : ''}
+        ${e.has_battery ? '<span style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:4px;padding:2px 7px;color:var(--green);">🔋 Battery</span>' : ''}
+        ${e.is_custom ? '<span style="background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:4px;padding:2px 7px;color:var(--teal);">✦ Custom</span>' : ''}
+      </div>
+      ${e.notes ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;">${e.notes}</div>` : ''}
+
+      <!-- CHECK MODE FIELDS -->
+      <div class="check-overlay">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:12px;">6-Monthly Check</div>
+        <div class="check-grid">
+          <div>
+            <div class="check-field-label">Present?</div>
+            <select class="check-select" onchange="setCheck('${e.id}','present',this.value);styleSelect(this)">
+              <option value="">Select...</option>
+              <option value="Yes" ${cd.present==='Yes'?'selected':''}>✅ Yes</option>
+              <option value="No" ${cd.present==='No'?'selected':''}>❌ No</option>
+            </select>
+          </div>
+          <div>
+            <div class="check-field-label">Functional Test</div>
+            <select class="check-select" onchange="setCheck('${e.id}','functional',this.value);styleSelect(this)">
+              <option value="">Select...</option>
+              <option value="Pass" ${cd.functional==='Pass'?'selected':''}>✅ Pass</option>
+              <option value="Fail" ${cd.functional==='Fail'?'selected':''}>❌ Fail</option>
+              <option value="N/A" ${cd.functional==='N/A'?'selected':''}>— N/A</option>
+            </select>
+          </div>
+          ${e.is_powered ? `<div>
+            <div class="check-field-label">Cord / PSU</div>
+            <select class="check-select" onchange="setCheck('${e.id}','cord_check',this.value);styleSelect(this)">
+              <option value="">Select...</option>
+              <option value="Good" ${cd.cord_check==='Good'?'selected':''}>✅ Good</option>
+              <option value="Damaged" ${cd.cord_check==='Damaged'?'selected':''}>❌ Damaged</option>
+              <option value="Missing" ${cd.cord_check==='Missing'?'selected':''}>🚫 Missing</option>
+            </select>
+          </div>` : '<div></div>'}
+          ${e.has_battery ? `<div>
+            <div class="check-field-label">Battery</div>
+            <select class="check-select" onchange="setCheck('${e.id}','battery_check',this.value);styleSelect(this)">
+              <option value="">Select...</option>
+              <option value="Good" ${cd.battery_check==='Good'?'selected':''}>✅ Good</option>
+              <option value="Flat" ${cd.battery_check==='Flat'?'selected':''}>⚠️ Flat</option>
+              <option value="Faulty" ${cd.battery_check==='Faulty'?'selected':''}>❌ Faulty</option>
+            </select>
+          </div>` : '<div></div>'}
+          <div>
+            <div class="check-field-label">Accessories</div>
+            <select class="check-select" onchange="setCheck('${e.id}','accessories',this.value);styleSelect(this)">
+              <option value="">Select...</option>
+              <option value="Complete" ${cd.accessories==='Complete'?'selected':''}>✅ Complete</option>
+              <option value="Partial" ${cd.accessories==='Partial'?'selected':''}>⚠️ Partial</option>
+              <option value="Missing" ${cd.accessories==='Missing'?'selected':''}>❌ Missing</option>
+            </select>
+          </div>
+          <div>
+            <div class="check-field-label">Backup Unit</div>
+            <select class="check-select" onchange="setCheck('${e.id}','backup_check',this.value);styleSelect(this)">
+              <option value="">Select...</option>
+              <option value="Yes" ${cd.backup_check==='Yes'?'selected':''}>✅ Available</option>
+              <option value="No" ${cd.backup_check==='No'?'selected':''}>❌ Not available</option>
+              <option value="N/A" ${cd.backup_check==='N/A'?'selected':''}>— N/A</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="check-field-label">Notes / Observations</div>
+          <input type="text" class="check-input" value="${cd.notes||''}" placeholder="Any issues or observations..." onchange="setCheck('${e.id}','notes',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <div class="equip-card-footer">
+      ${editable ? `<button class="btn btn-outline btn-sm" onclick="openSerialModal('${e.id}','${(e.serial_no||'').replace(/'/g,"\\'")}','${e.redundancy||'no'}','${(e.notes||'').replace(/'/g,"\\'")}')">✏️ Edit Details</button>` : ''}
+      ${editable ? `<button class="btn btn-ghost btn-sm" onclick="deleteEquip('${e.id}')">🗑</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function styleSelect(el) {
+  el.className = 'check-select';
+  const v = el.value;
+  if (['Pass','Good','Yes','Complete','Available'].includes(v)) el.classList.add('pass');
+  else if (['Fail','Damaged','Missing','Flat','Faulty','No','Not available'].includes(v)) el.classList.add('fail');
+  else if (v === 'N/A') el.classList.add('na');
+}
+
+// Check mode
+function startCheck() {
+  checkMode = true; checkData = {};
+  inventory.forEach(e => { checkData[e.id] = {}; });
+  renderStation();
+  document.getElementById('stickySubmitBar').classList.add('active');
+  document.body.classList.add('check-active');
+}
+function cancelCheck() {
+  checkMode = false; checkData = {};
+  document.getElementById('stickySubmitBar').classList.remove('active');
+  document.body.classList.remove('check-active');
+  renderStation();
+}
+function setCheck(id, field, value) { if (!checkData[id]) checkData[id] = {}; checkData[id][field] = value; }
+
+function openSubmitModal() {
+  document.getElementById('submitStationName').textContent = `${currentStation} — ${STATION_NAMES[currentStation]}`;
+  let ok = 0, issues = 0, powerFails = 0, missing = 0;
+  inventory.forEach(e => {
+    const cd = checkData[e.id] || {};
+    if (cd.functional === 'Pass' && cd.present === 'Yes') ok++;
+    if (cd.functional === 'Fail') issues++;
+    if ((cd.cord_check === 'Damaged' || cd.cord_check === 'Missing') && e.is_powered) powerFails++;
+    if (cd.present === 'No') missing++;
+  });
+  document.getElementById('submitSummary').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div>📡 <strong>Total items:</strong> ${inventory.length}</div>
+      <div style="color:var(--green);">✅ <strong>Passed:</strong> ${ok}</div>
+      <div style="color:var(--red);">⚠️ <strong>Functional fails:</strong> ${issues}</div>
+      <div style="color:var(--red);">🚫 <strong>Not present:</strong> ${missing}</div>
+      <div style="color:${powerFails>0?'var(--red)':'var(--green)'};">⚡ <strong>Power issues:</strong> ${powerFails}</div>
+    </div>`;
+  document.getElementById('submitCheckModal').classList.add('open');
+}
+
+function closeSubmitModal() { document.getElementById('submitCheckModal').classList.remove('open'); }
+
+async function finalSubmit() {
+  let ok = 0;
+  inventory.forEach(e => {
+    const cd = checkData[e.id] || {};
+    if (cd.functional === 'Pass' || cd.present === 'Yes') ok++;
+  });
+  const items = inventory.map(e => ({ equip_id: e.id, equipment: e.equipment, ...checkData[e.id] }));
+  const { error } = await sb.from('testequip_checks').insert({
+    station_code: currentStation,
+    check_date: new Date().toISOString(),
+    checked_by: userProfile?.full_name || currentUser.email,
+    items_ok: ok, items_total: inventory.length,
+    remarks: document.getElementById('submitRemarks').value,
+    check_details: items
+  });
+  if (error) { alert('Error: ' + error.message); return; }
+  closeSubmitModal();
+  checkMode = false; checkData = {};
+  document.getElementById('stickySubmitBar').classList.remove('active');
+  document.body.classList.remove('check-active');
+  await renderStation();
+}
+
+// Inventory management
+function openAddEquip() { document.getElementById('addEquipModal').classList.add('open'); }
+function closeAddEquip() { document.getElementById('addEquipModal').classList.remove('open'); }
+
+async function saveNewEquip() {
+  const name = document.getElementById('newEquipName').value.trim();
+  if (!name) { alert('Equipment name is required.'); return; }
+  const nextNo = inventory.length > 0 ? Math.max(...inventory.map(e => e.equip_no||0)) + 1 : 1;
+  const { error } = await sb.from('testequip_inventory').insert({
+    station_code: currentStation,
+    equip_no: nextNo,
+    equipment: name,
+    description: document.getElementById('newEquipDesc').value.trim(),
+    supplier: document.getElementById('newEquipSupplier').value.trim(),
+    serial_no: document.getElementById('newEquipSerial').value.trim(),
+    redundancy: document.getElementById('newEquipBackup').value,
+    is_powered: document.getElementById('newEquipPowered').checked,
+    has_battery: document.getElementById('newEquipBattery').checked,
+    notes: document.getElementById('newEquipNotes').value.trim(),
+    is_custom: true
+  });
+  if (error) { alert('Error: ' + error.message); return; }
+  closeAddEquip();
+  await renderStation();
+}
+
+async function deleteEquip(id) {
+  if (!confirm('Remove this equipment from the station inventory?')) return;
+  await sb.from('testequip_inventory').delete().eq('id', id);
+  await renderStation();
+}
+
+// Serial / details modal
+function openSerialModal(id, serial, backup, notes) {
+  document.getElementById('serialEquipId').value = id;
+  document.getElementById('serialInput').value = serial;
+  document.getElementById('serialBackup').value = backup;
+  document.getElementById('serialNotes').value = notes;
+  document.getElementById('serialModal').classList.add('open');
+}
+
+function closeSerialModal() { document.getElementById('serialModal').classList.remove('open'); }
+
+async function saveSerial() {
+  const id = document.getElementById('serialEquipId').value;
+  const { error } = await sb.from('testequip_inventory').update({
+    serial_no: document.getElementById('serialInput').value.trim(),
+    redundancy: document.getElementById('serialBackup').value,
+    notes: document.getElementById('serialNotes').value.trim()
+  }).eq('id', id);
+  if (error) { alert('Error: ' + error.message); return; }
+  closeSerialModal();
+  await renderStation();
+}
+
+// Seed master list
+async function autoSeedMaster() {
+  const toInsert = MASTER_EQUIP.map(e => ({
+    station_code: currentStation,
+    equip_no: e.no,
+    equipment: e.equipment,
+    description: e.description,
+    supplier: e.supplier,
+    is_powered: e.is_powered,
+    has_battery: e.has_battery,
+    redundancy: 'no',
+    is_custom: false
+  }));
+  await sb.from('testequip_inventory').insert(toInsert);
+}
+
+async function seedMaster() {
+  if (!confirm(`Load all 13 standard EASSy test equipment items into ${currentStation}? Existing items won't be duplicated.`)) return;
+  const existingNos = new Set(inventory.map(e => e.equip_no));
+  const toInsert = MASTER_EQUIP.filter(e => !existingNos.has(e.no)).map(e => ({
+    station_code: currentStation,
+    equip_no: e.no,
+    equipment: e.equipment,
+    description: e.description,
+    supplier: e.supplier,
+    is_powered: e.is_powered,
+    has_battery: e.has_battery,
+    redundancy: 'no',
+    is_custom: false
+  }));
+  if (toInsert.length === 0) { alert('All master items already in inventory.'); return; }
+  const { error } = await sb.from('testequip_inventory').insert(toInsert);
+  if (error) { alert('Error: ' + error.message); return; }
+  await renderStation();
+}
+
+init();
+</script>
+</body>
+</html>
