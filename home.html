@@ -635,18 +635,18 @@
 
 <!-- ── CABLE ROUTE BAR ── -->
 <div class="cable-bar">
-    <div class="cable-stop"><div class="cable-node"></div><div class="cable-label">🇵🇹 Sesimbra</div></div>
-    <div class="cable-line"></div>
-    <div class="cable-stop"><div class="cable-node"></div><div class="cable-label">🇹🇬 Lomé</div></div>
-    <div class="cable-line"></div>
-    <div class="cable-stop"><div class="cable-node"></div><div class="cable-label">🇳🇬 Lagos</div></div>
-    <div class="cable-line"></div>
-    <div class="cable-stop"><div class="cable-node"></div><div class="cable-label">🇸🇭 Rupert's Bay</div></div>
-    <div class="cable-line"></div>
-    <div class="cable-stop"><div class="cable-node"></div><div class="cable-label">🇳🇦 Swakopmund</div></div>
-    <div class="cable-line"></div>
-    <div class="cable-stop"><div class="cable-node"></div><div class="cable-label">🇿🇦 Melkbosstrand</div></div>
-  </div>
+  <div class="cable-stop"><div class="cable-node"></div><span class="cable-code">🇵🇹 SSB</span></div>
+  <div class="cable-seg"></div>
+  <div class="cable-stop"><div class="cable-node"></div><span class="cable-code">🇹🇬 LME</span></div>
+  <div class="cable-seg"></div>
+  <div class="cable-stop"><div class="cable-node"></div><span class="cable-code">🇳🇬 LGS</span></div>
+  <div class="cable-seg"></div>
+  <div class="cable-stop"><div class="cable-node"></div><span class="cable-code">🇸🇭 RBY</span></div>
+  <div class="cable-seg"></div>
+  <div class="cable-stop"><div class="cable-node"></div><span class="cable-code">🇳🇦 SWK</span></div>
+  <div class="cable-seg"></div>
+  <div class="cable-stop"><div class="cable-node"></div><span class="cable-code">🇿🇦 MKB</span></div>
+</div>
 
 <!-- ── HERO ── -->
 <div class="hero">
@@ -656,11 +656,11 @@
   </div>
   <div class="hero-stats">
     <div class="hero-stat">
-      <div class="hero-stat-val">9</div>
+      <div class="hero-stat-val">6</div>
       <div class="hero-stat-label">Stations</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-val">3</div>
+      <div class="hero-stat-val">8</div>
       <div class="hero-stat-label">Modules</div>
     </div>
     <div class="hero-stat">
@@ -673,9 +673,9 @@
 <!-- ── MAIN ── -->
 <main class="main">
 
-  <div class="section-label">Select a module</div>
+  <div class="section-label">Operations &amp; Maintenance</div>
 
-  <div class="modules-row">
+  <div class="modules-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
 
     <a href="index.html" class="module-card routines" onclick="return gotoModule(event,'index.html')">
       <div class="module-card-accent"></div>
@@ -683,11 +683,7 @@
       <div class="module-card-title">Maintenance Routines</div>
       <div class="module-card-desc">Daily, weekly, monthly and 6-monthly maintenance checks for all CLS equipment and facility systems.</div>
       <div class="module-tags">
-        <span class="tag">Daily</span>
-        <span class="tag">Weekly</span>
-        <span class="tag">Monthly</span>
-        <span class="tag">6-Monthly</span>
-        <span class="tag">PFE</span>
+        <span class="tag">Daily</span><span class="tag">Weekly</span><span class="tag">Monthly</span><span class="tag">6-Monthly</span>
       </div>
       <div class="module-cta">Open Routines →</div>
     </a>
@@ -698,9 +694,7 @@
       <div class="module-card-title">Station Tools</div>
       <div class="module-card-desc">Tool inventory management, 6-monthly physical checks, and power supply &amp; cord condition inspections.</div>
       <div class="module-tags">
-        <span class="tag">Inventory</span>
-        <span class="tag">6-Monthly Check</span>
-        <span class="tag">Power / Cord</span>
+        <span class="tag">Inventory</span><span class="tag">6-Monthly Check</span>
       </div>
       <div class="module-cta">Open Tools →</div>
     </a>
@@ -711,15 +705,68 @@
       <div class="module-card-title">Test Equipment</div>
       <div class="module-card-desc">Test equipment inventory, calibration tracking, 6-monthly functional checks and redundancy verification.</div>
       <div class="module-tags">
-        <span class="tag">Calibration</span>
-        <span class="tag">6-Monthly Check</span>
-        <span class="tag">Redundancy</span>
+        <span class="tag">Calibration</span><span class="tag">6-Monthly Check</span>
       </div>
       <div class="module-cta">Open Test Equip →</div>
     </a>
 
+    <a href="jointing.html" class="module-card" style="border-top:4px solid #8b5cf6" onclick="return gotoModule(event,'jointing.html')">
+      <div class="module-icon-wrap">🔩</div>
+      <div class="module-card-title">Jointing Support</div>
+      <div class="module-card-desc">Jointing support tools checklist and verification for submarine cable jointing operations.</div>
+      <div class="module-tags">
+        <span class="tag">Checklist</span><span class="tag">Verification</span>
+      </div>
+      <div class="module-cta">Open Jointing →</div>
+    </a>
+
   </div>
 
+  <div class="section-label">Management &amp; Monitoring</div>
+
+  <div class="modules-row" style="grid-template-columns:repeat(4,1fr)">
+
+    <a href="faults.html" class="module-card" style="border-top:4px solid #ef4444" onclick="return gotoModule(event,'faults.html')">
+      <div class="module-icon-wrap">⚠️</div>
+      <div class="module-card-title">Fault Management</div>
+      <div class="module-card-desc">Log, track and resolve station faults. Monitor open faults and escalation status across the system.</div>
+      <div class="module-tags">
+        <span class="tag">Fault Log</span><span class="tag">Escalation</span>
+      </div>
+      <div class="module-cta">Open Faults →</div>
+    </a>
+
+    <a href="stationlog.html" class="module-card" style="border-top:4px solid #0284c7" onclick="return gotoModule(event,'stationlog.html')">
+      <div class="module-icon-wrap">📓</div>
+      <div class="module-card-title">Station Log</div>
+      <div class="module-card-desc">Record and review station events, visitor logs, access records and general station activities.</div>
+      <div class="module-tags">
+        <span class="tag">Events</span><span class="tag">Access Log</span>
+      </div>
+      <div class="module-cta">Open Station Log →</div>
+    </a>
+
+    <a href="spares.html" class="module-card" style="border-top:4px solid #059669" onclick="return gotoModule(event,'spares.html')">
+      <div class="module-icon-wrap">🗄️</div>
+      <div class="module-card-title">Spares Inventory</div>
+      <div class="module-card-desc">Manage critical spare parts inventory, stock levels, and replenishment tracking for the station.</div>
+      <div class="module-tags">
+        <span class="tag">Inventory</span><span class="tag">Stock Levels</span>
+      </div>
+      <div class="module-cta">Open Spares →</div>
+    </a>
+
+    <a href="compliance.html" class="module-card" style="border-top:4px solid #d97706" onclick="return gotoModule(event,'compliance.html')">
+      <div class="module-icon-wrap">✅</div>
+      <div class="module-card-title">Compliance</div>
+      <div class="module-card-desc">Track compliance requirements, certification status and regulatory obligations for the station.</div>
+      <div class="module-tags">
+        <span class="tag">Compliance</span><span class="tag">Certifications</span>
+      </div>
+      <div class="module-cta">Open Compliance →</div>
+    </a>
+
+  </div>
 
 </main>
 

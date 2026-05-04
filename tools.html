@@ -579,6 +579,11 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ─── ADMIN LIST ───
 const ADMIN_WHITELIST = {
   'LGS': 'verne.steyn@wiocc.net',
+  'SSB': 'verne.steyn@wiocc.net',
+  'LME': 'verne.steyn@wiocc.net',
+  'RBY': 'verne.steyn@wiocc.net',
+  'SWK': 'verne.steyn@wiocc.net',
+  'MKB': 'verne.steyn@wiocc.net',
   'SUPER': 'verne.steyn@wiocc.net'
 };
 
@@ -707,7 +712,7 @@ function renderSetupPrompt() {
 
 function renderStationDashboard(lastChecks) {
   const flag = getFlag(currentStation);
-  const stationNames = {MNZ:'Mtunzini',MPT:'Maputo',DES:'Dar es Salaam',MBS:'Mombasa',MGD:'Mogadishu',DBT:'Djibouti',PSD:'Port Sudan',TLR:'Toliary',MRN:'Moroni'};
+  const stationNames = {SSB:'Sesimbra',LME:'Lomé',LGS:'Lagos',RBY:"Rupert's Bay",SWK:'Swakopmund',MKB:'Melkbosstrand'};
   const canEdit = canEditStation(currentStation);
 
   // Stats
@@ -960,7 +965,7 @@ function toggleMissingFilter() {
 }
 
 function downloadCheckSheet() {
-  const stationNames = {MNZ:'Mtunzini',MPT:'Maputo',DES:'Dar es Salaam',MBS:'Mombasa',MGD:'Mogadishu',DBT:'Djibouti',PSD:'Port Sudan',TLR:'Toliary',MRN:'Moroni'};
+  const stationNames = {SSB:'Sesimbra',LME:'Lomé',LGS:'Lagos',RBY:"Rupert's Bay",SWK:'Swakopmund',MKB:'Melkbosstrand'};
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
 
@@ -995,7 +1000,7 @@ function downloadCheckSheet() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `EASSy_Tools_Check_${currentStation}_${now.toISOString().slice(0,10)}.csv`;
+  a.download = `Equiano_Tools_Check_${currentStation}_${now.toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1033,7 +1038,7 @@ function setCheck(toolId, field, value) {
 }
 
 function openSubmitModal() {
-  const stationNames = {MNZ:'Mtunzini',MPT:'Maputo',DES:'Dar es Salaam',MBS:'Mombasa',MGD:'Mogadishu',DBT:'Djibouti',PSD:'Port Sudan',TLR:'Toliary',MRN:'Moroni'};
+  const stationNames = {SSB:'Sesimbra',LME:'Lomé',LGS:'Lagos',RBY:"Rupert's Bay",SWK:'Swakopmund',MKB:'Melkbosstrand'};
   document.getElementById('submitStationName').textContent = `${currentStation} — ${stationNames[currentStation]}`;
 
   const total = inventory.length;
